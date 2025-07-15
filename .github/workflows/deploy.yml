@@ -10,11 +10,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -26,19 +21,15 @@ jobs:
         cache: 'npm'
         
     - name: Install dependencies
-      run: npm install --legacy-peer-deps
+      run: npm ci --legacy-peer-deps
       
-    - name: Export Expo web
+    - name: Export static files
       run: npx expo export --platform web
       
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-      
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: './dist'
-        
     - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
+        cname: your-custom-domain.com # Optional: remove if you don't have a custom domain
